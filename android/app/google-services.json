@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "725338806491",
+    "project_id": "saudagar-matka",
+    "storage_bucket": "saudagar-matka.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:725338806491:android:564e18a927aa1e1d7a14fe",
+        "android_client_info": {
+          "package_name": "com.saudagar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDriVPOcVAOmZ0x-Q-NBRvq3wmMVQpIftQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

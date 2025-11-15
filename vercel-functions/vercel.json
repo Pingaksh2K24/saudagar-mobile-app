@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/send-receipt.js": {
+      "runtime": "@vercel/node"
+    }
+  }
+}
