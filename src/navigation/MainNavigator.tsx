@@ -8,6 +8,7 @@ import { BidPlacementScreen } from '../screens/Dashboard/Bid/BidPlacement/BidPla
 import { BidReceiptScreen } from '../screens/Dashboard/Bid/BidReceipt/BidReceiptScreen';
 import { ReceiptScreen } from '../screens/Dashboard/Receipt/ReceiptScreen/ReceiptScreen';
 import { ReceiptDetailsScreen } from '../screens/Dashboard/Receipt/ReceiptDetails/ReceiptDetailsScreen';
+import { PrintTestScreen } from '../screens/Dashboard/PrintTest/PrintTestScreen';
 
 const Stack = createStackNavigator();
 
@@ -22,6 +23,7 @@ export const MainNavigator: React.FC = () => {
       <Stack.Screen name="BidReceipt" component={BidReceiptScreen} />
       <Stack.Screen name="ReceiptScreen" component={ReceiptScreen} />
       <Stack.Screen name="ReceiptDetails" component={ReceiptDetailsScreen} />
+      <Stack.Screen name="PrintTest" component={PrintTestScreen} />
     </Stack.Navigator>
   );
 };

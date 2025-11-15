@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,12 +6,14 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { BackHeader } from '../../../../components/BackHeader/BackHeader';
-
 import { useNotification } from '../../../../components/Notification/NotificationManager';
+
 
 import { styles } from './styles';
 
@@ -19,14 +21,20 @@ export const ReceiptDetailsScreen: React.FC = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const { showNotification } = useNotification();
+  const [isPrinting, setIsPrinting] = useState(false);
   const { receiptData, receiptNo } = route.params as {
     receiptData: any;
     receiptNo: string;
   };
 
   const handlePrint = async () => {
+    setIsPrinting(true);
     try {
+      const { NativeModules } = require('react-native');
+      const { PrinterModule } = NativeModules;
+      
       const receiptText = `
+SAUDAGAR
 ${receiptData.bids?.[0]?.game_name || 'Game'}
 Receipt #${receiptData.receipt_info?.receipt_no || receiptNo}
 --------------------------------
@@ -35,17 +43,16 @@ Date: ${receiptData.receipt_info?.receipt_date ? new Date(receiptData.receipt_in
 Session: ${receiptData.receipt_info?.session || 'Open'}
 --------------------------------
 BID DETAILS:
-${receiptData.bids?.map((bid: any, index: number) => `${index + 1}. ${bid.bid_type_name} - ${bid.bid_number} - ₹${bid.amount}`).join('\n')}
+${receiptData.bids?.map((bid: any, index: number) => `${index + 1}. ${bid.bid_type_name} - ${bid.bid_number} - Rs${bid.amount}`).join('\n')}
 --------------------------------
-TOTAL: ₹${receiptData.receipt_info?.total_amount || 0}
+TOTAL: Rs${receiptData.receipt_info?.total_amount || 0}
 --------------------------------
 * Receipt generated upon request
 
 
 `;
 
-      // Print functionality will be implemented later
-      console.log('Receipt to print:', receiptText);
+      await PrinterModule.printReceipt(receiptText);
       
       showNotification({
         type: 'success',
@@ -53,11 +60,14 @@ TOTAL: ₹${receiptData.receipt_info?.total_amount || 0}
         message: 'Receipt printed successfully!',
       });
     } catch (error) {
+      console.error('Print error:', error);
       showNotification({
         type: 'error',
         title: 'Print Failed',
-        message: 'Please check printer connection and try again.',
+        message: error.message || 'Please check printer connection and try again.',
       });
+    } finally {
+      setIsPrinting(false);
     }
   };
 
@@ -144,9 +154,19 @@ TOTAL: ₹${receiptData.receipt_info?.total_amount || 0}
         </View>
 
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.printBtn} onPress={handlePrint}>
-            <Icon name="print" size={24} color="#EF4444" />
-            <Text style={styles.printBtnText}>Print Receipt</Text>
+          <TouchableOpacity 
+            style={[styles.printBtn, isPrinting && styles.printBtnDisabled]} 
+            onPress={handlePrint}
+            disabled={isPrinting}
+          >
+            {isPrinting ? (
+              <ActivityIndicator size="small" color="#EF4444" />
+            ) : (
+              <Icon name="print" size={24} color="#EF4444" />
+            )}
+            <Text style={styles.printBtnText}>
+              {isPrinting ? 'Printing...' : 'Print Receipt'}
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

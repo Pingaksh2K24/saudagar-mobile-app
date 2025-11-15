@@ -1,7 +1,7 @@
 import { IsProdMode } from '../../utils/AppSetting';
 // Web API url
-// export const APIURL = IsProdMode ? 'https://saudagar-backend.onrender.com/api/' : 'http://10.0.2.2:3000/api/';
-export const APIURL = 'http://10.0.2.2:3000/api/'
+export const APIURL = IsProdMode ? 'https://saudagar-backend.onrender.com/api/' : 'http://10.0.2.2:3000/api/';
+// export const APIURL = 'http://10.0.2.2:3000/api/'
 
 //Authentication services
 export const UserLogin = 'auth/login';
