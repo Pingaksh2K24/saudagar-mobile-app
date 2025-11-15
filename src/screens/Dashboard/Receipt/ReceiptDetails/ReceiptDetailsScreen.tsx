@@ -33,24 +33,25 @@ export const ReceiptDetailsScreen: React.FC = () => {
       const { NativeModules } = require('react-native');
       const { PrinterModule } = NativeModules;
       
-      const receiptText = `
-SAUDAGAR
-${receiptData.bids?.[0]?.game_name || 'Game'}
-Receipt #${receiptData.receipt_info?.receipt_no || receiptNo}
---------------------------------
-Agent: ${receiptData.receipt_info?.agent_name || 'Agent'}
-Date: ${receiptData.receipt_info?.receipt_date ? new Date(receiptData.receipt_info.receipt_date).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB')}
-Session: ${receiptData.receipt_info?.session || 'Open'}
---------------------------------
-BID DETAILS:
-${receiptData.bids?.map((bid: any, index: number) => `${index + 1}. ${bid.bid_type_name} - ${bid.bid_number} - Rs${bid.amount}`).join('\n')}
---------------------------------
-TOTAL: Rs${receiptData.receipt_info?.total_amount || 0}
---------------------------------
-* Receipt generated upon request
-
-
-`;
+      const gameName = receiptData.bids?.[0]?.game_name || 'Game';
+      const gameInitials = gameName.split(' ').map(word => word.charAt(0)).join('').toUpperCase();
+      const session = receiptData.receipt_info?.session || 'Open';
+      const sessionCode = session.toLowerCase() === 'open' ? 'OP' : 'CL';
+      const receiptDate = receiptData.receipt_info?.receipt_date ? new Date(receiptData.receipt_info.receipt_date).toLocaleDateString('en-GB') : new Date().toLocaleDateString('en-GB');
+      console.log("Bid Details : ",receiptData.bids);
+      const receiptText = 'SAU-' + gameInitials + '\n' +
+        'Receipt: ' + (receiptData.receipt_info?.receipt_no || receiptNo) + '\n' +
+        'Date: ' + receiptDate + ' - ' + sessionCode + '\n' +
+        '--------------------------------\n' +
+        'BID DETAILS:\n' +
+        receiptData.bids?.map(bid => {
+          const bidTypeInitials = bid.bid_type_name.split(' ').map(word => word.charAt(0)).join('').toUpperCase();
+          return bidTypeInitials + ' - ' + bid.bid_number + ' - Rs' + bid.amount;
+        }).join('\n') + '\n' +
+        '--------------------------------\n' +
+        'TOTAL: Rs' + (receiptData.receipt_info?.total_amount || 0) + '\n' +
+        '--------------------------------\n' +
+        '* Receipt generated upon request\n\n\n\n';
 
       await PrinterModule.printReceipt(receiptText);
       
