@@ -40,11 +40,10 @@ export const styles = StyleSheet.create({
   deviceItem: {
     backgroundColor: '#1A2332',
     borderRadius: 10,
-    padding: 15,
+    padding: 8,
     marginBottom: 10,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
   },
   connectedDevice: {
     backgroundColor: '#10B981',
@@ -54,6 +53,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 15,
+    flex: 1,
   },
   deviceDetails: {
     flex: 1,
@@ -71,7 +71,7 @@ export const styles = StyleSheet.create({
   printButton: {
     backgroundColor: '#FFFFFF',
     borderRadius: 10,
-    padding: 18,
+    padding: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

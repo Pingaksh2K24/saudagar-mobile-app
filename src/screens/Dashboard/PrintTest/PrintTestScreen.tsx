@@ -24,6 +24,7 @@ export const PrintTestScreen: React.FC = () => {
   const [devices, setDevices] = useState<BluetoothDevice[]>([]);
   const [isScanning, setIsScanning] = useState(false);
   const [connectedDevice, setConnectedDevice] = useState<string | null>(null);
+  const [isPrinting, setIsPrinting] = useState(false);
 
   const scanDevices = async () => {
     setIsScanning(true);
@@ -56,6 +57,7 @@ export const PrintTestScreen: React.FC = () => {
   };
 
   const printTest = async () => {
+    setIsPrinting(true);
     try {
       const { NativeModules } = require('react-native');
       const { PrinterModule } = NativeModules;
@@ -91,6 +93,8 @@ your printer is working correctly.
         title: 'Print Failed',
         message: error.message || 'Failed to print test receipt',
       });
+    } finally {
+      setIsPrinting(false);
     }
   };
 
@@ -156,9 +160,16 @@ your printer is working correctly.
           <TouchableOpacity 
             style={styles.printButton} 
             onPress={printTest}
+            disabled={isPrinting}
           >
-            <Icon name="print" size={24} color="#EF4444" />
-            <Text style={styles.printButtonText}>Print Test Receipt</Text>
+            {isPrinting ? (
+              <ActivityIndicator size="small" color="#EF4444" />
+            ) : (
+              <Icon name="print" size={24} color="#EF4444" />
+            )}
+            <Text style={styles.printButtonText}>
+              {isPrinting ? 'Printing...' : 'Print Test'}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

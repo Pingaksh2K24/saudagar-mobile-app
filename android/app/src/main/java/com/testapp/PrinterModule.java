@@ -28,6 +28,9 @@ public class PrinterModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void printReceipt(String receiptText, Promise promise) {
+        BluetoothSocket socket = null;
+        OutputStream outputStream = null;
+        
         try {
             if (ActivityCompat.checkSelfPermission(getReactApplicationContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                 promise.reject("NO_PERMISSION", "Bluetooth permission not granted. Please enable in app settings.");
@@ -40,33 +43,80 @@ public class PrinterModule extends ReactContextBaseJavaModule {
                 return;
             }
 
-            StringBuilder deviceList = new StringBuilder("Paired devices: ");
+            if (!bluetoothAdapter.isEnabled()) {
+                promise.reject("BLUETOOTH_DISABLED", "Bluetooth is disabled. Please enable Bluetooth.");
+                return;
+            }
+
+            BluetoothDevice printerDevice = null;
+            
+            // Try to find a printer device (look for common printer names)
             for (BluetoothDevice device : bluetoothAdapter.getBondedDevices()) {
-                deviceList.append(device.getName()).append(", ");
+                String deviceName = device.getName();
+                if (deviceName != null && (deviceName.toLowerCase().contains("printer") || 
+                    deviceName.toLowerCase().contains("pos") || 
+                    deviceName.toLowerCase().contains("thermal"))) {
+                    printerDevice = device;
+                    break;
+                }
             }
             
-            BluetoothDevice printerDevice = null;
-            if (bluetoothAdapter.getBondedDevices().size() > 0) {
+            // If no printer found, use first paired device
+            if (printerDevice == null && bluetoothAdapter.getBondedDevices().size() > 0) {
                 printerDevice = bluetoothAdapter.getBondedDevices().iterator().next();
             }
 
             if (printerDevice == null) {
-                promise.reject("NO_PRINTER", "No paired devices found. " + deviceList.toString());
+                promise.reject("NO_PRINTER", "No paired printer devices found. Please pair your printer first.");
                 return;
             }
 
-            BluetoothSocket socket = printerDevice.createRfcommSocketToServiceRecord(MY_UUID);
+            // Create socket and connect
+            socket = printerDevice.createRfcommSocketToServiceRecord(MY_UUID);
+            
+            // Cancel discovery to improve connection reliability
+            bluetoothAdapter.cancelDiscovery();
+            
+            // Connect with timeout handling
             socket.connect();
             
-            OutputStream outputStream = socket.getOutputStream();
-            outputStream.write(receiptText.getBytes());
+            // Verify connection
+            if (!socket.isConnected()) {
+                throw new IOException("Failed to establish connection to printer");
+            }
+            
+            outputStream = socket.getOutputStream();
+            
+            // Add small delay before writing
+            Thread.sleep(100);
+            
+            // Write data
+            outputStream.write(receiptText.getBytes("UTF-8"));
             outputStream.flush();
             
-            socket.close();
-            promise.resolve("Print successful");
+            // Add delay to ensure data is sent
+            Thread.sleep(500);
+            
+            promise.resolve("Print successful to " + printerDevice.getName());
             
         } catch (IOException e) {
-            promise.reject("PRINT_ERROR", e.getMessage());
+            promise.reject("CONNECTION_ERROR", "Failed to connect to printer: " + e.getMessage());
+        } catch (InterruptedException e) {
+            promise.reject("INTERRUPTED", "Print operation was interrupted: " + e.getMessage());
+        } catch (Exception e) {
+            promise.reject("PRINT_ERROR", "Print failed: " + e.getMessage());
+        } finally {
+            // Ensure resources are properly closed
+            try {
+                if (outputStream != null) {
+                    outputStream.close();
+                }
+                if (socket != null && socket.isConnected()) {
+                    socket.close();
+                }
+            } catch (IOException e) {
+                // Log but don't fail the promise
+            }
         }
     }
 }

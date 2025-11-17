@@ -73,6 +73,9 @@ export const SideMenu: React.FC<SideMenuProps> = ({ isVisible, onClose }) => {
           case 'Contact Us':
             navigation.navigate('ContactUs' as never);
             break;
+          case 'Printer Test':
+            navigation.navigate('PrintTest' as never);
+            break;
           default:
             console.log('Unknown menu item:', item.title);
         }
@@ -84,6 +87,7 @@ export const SideMenu: React.FC<SideMenuProps> = ({ isVisible, onClose }) => {
     { id: 3, title: 'Bid History', icon: 'history' },
     { id: 4, title: 'Receipt', icon: 'receipt' },
     { id: 8, title: 'Contact Us', icon: 'contact-support' },
+    { id: 9, title: 'Printer Test', icon: 'print' },
     { id: 10, title: 'Logout', icon: 'logout' },
   ];
 
