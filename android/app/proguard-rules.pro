@@ -8,3 +8,20 @@
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
 # Add any project specific keep options here:
+
+# Keep PrinterModule classes
+-keep class com.testapp.PrinterModule { *; }
+-keep class com.testapp.PrinterPackage { *; }
+
+# Keep Bluetooth related classes
+-keep class android.bluetooth.** { *; }
+-dontwarn android.bluetooth.**
+
+# Keep reflection methods used in PrinterModule
+-keepclassmembers class android.bluetooth.BluetoothDevice {
+    public java.lang.reflect.Method createRfcommSocket(int);
+}
+
+# Keep React Native modules
+-keep class com.facebook.react.bridge.** { *; }
+-keep class com.facebook.react.modules.** { *; }

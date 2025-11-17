@@ -13,6 +13,7 @@ import com.facebook.react.bridge.Promise;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.UUID;
+import java.lang.reflect.Method;
 
 public class PrinterModule extends ReactContextBaseJavaModule {
     private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
@@ -71,14 +72,59 @@ public class PrinterModule extends ReactContextBaseJavaModule {
                 return;
             }
 
-            // Create socket and connect
-            socket = printerDevice.createRfcommSocketToServiceRecord(MY_UUID);
-            
             // Cancel discovery to improve connection reliability
             bluetoothAdapter.cancelDiscovery();
             
-            // Connect with timeout handling
-            socket.connect();
+            // Try multiple socket creation methods for better compatibility
+            Exception lastException = null;
+            boolean connected = false;
+            
+            // Method 1: Standard RFCOMM socket
+            try {
+                socket = printerDevice.createRfcommSocketToServiceRecord(MY_UUID);
+                socket.connect();
+                connected = socket.isConnected();
+            } catch (Exception e) {
+                lastException = e;
+                if (socket != null) {
+                    try { socket.close(); } catch (Exception ignored) {}
+                }
+            }
+            
+            // Method 2: Fallback using reflection (for problematic devices)
+            if (!connected) {
+                try {
+                    socket = (BluetoothSocket) printerDevice.getClass()
+                        .getMethod("createRfcommSocket", new Class[] { int.class })
+                        .invoke(printerDevice, 1);
+                    socket.connect();
+                    connected = socket.isConnected();
+                } catch (Exception e) {
+                    lastException = e;
+                    if (socket != null) {
+                        try { socket.close(); } catch (Exception ignored) {}
+                    }
+                }
+            }
+            
+            // Method 3: Insecure RFCOMM socket (last resort)
+            if (!connected) {
+                try {
+                    socket = printerDevice.createInsecureRfcommSocketToServiceRecord(MY_UUID);
+                    socket.connect();
+                    connected = socket.isConnected();
+                } catch (Exception e) {
+                    lastException = e;
+                    if (socket != null) {
+                        try { socket.close(); } catch (Exception ignored) {}
+                    }
+                }
+            }
+            
+            if (!connected) {
+                throw new IOException("Failed to connect using all methods. Last error: " + 
+                    (lastException != null ? lastException.getMessage() : "Unknown error"));
+            }
             
             // Verify connection
             if (!socket.isConnected()) {
