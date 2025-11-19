@@ -15,11 +15,11 @@ export const Header: React.FC<HeaderProps> = ({
   return (
     <View style={styles.header}>
       <TouchableOpacity style={styles.menuButton} onPress={onMenuPress} activeOpacity={0.7}>
-        <Icon name="menu" size={32} color="#FFFFFF" />
+        <Icon name="menu" size={28} color="#6B7280" />
       </TouchableOpacity>
       
       <TouchableOpacity style={styles.notificationButton} onPress={onNotificationPress} activeOpacity={0.7}>
-        <Icon name="notifications" size={32} color="#FFFFFF" />
+        <Icon name="notifications" size={28} color="#6B7280" />
       </TouchableOpacity>
     </View>
   );

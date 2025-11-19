@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000B43',
+    backgroundColor: '#F8FAFC',
   },
   content: {
     flex: 1,
@@ -14,43 +14,47 @@ export const styles = StyleSheet.create({
   },
   receiptCard: {
     borderRadius: 16,
-    padding: 20,
+    padding: 10,
     marginBottom: 16,
+    backgroundColor: '#FFFFFF',
     borderLeftWidth: 4,
     borderLeftColor: '#EF4444',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 24 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 18,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    overflow: 'hidden',
   },
   receiptHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     flexWrap: 'wrap',
-    borderBottomWidth: 2,
+    borderBottomWidth: 1,
     borderBottomColor: 'rgba(255, 255, 255, 0.3)',
-    marginTop: 5,
-    paddingBottom: 8,
-    marginBottom: 15,
+    marginTop: 2,
+    paddingBottom: 2,
+    marginBottom: 8,
   },
   receiptTitle: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: 'bold',
     color: '#FFFFFF',
     flex: 1,
     minWidth: 120,
   },
   receiptId: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: 'bold',
-    color: '#b18409ff',
+    color: '#ffffff',
     flexShrink: 1,
     textAlign: 'right',
   },
   receiptBody: {
-    gap: 15,
+    gap: 12,
   },
   doubleRow: {
     flexDirection: 'row',
@@ -72,12 +76,13 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   label: {
-    fontSize: 16,
+    fontSize: 12,
     color: '#9CA3AF',
   },
   value: {
-    fontSize: 16,
+    fontSize: 12,
     color: '#FFFFFF',
+    textTransform:'capitalize',
   },
   statusPending: {
     color: '#F59E0B',
@@ -95,7 +100,7 @@ export const styles = StyleSheet.create({
     fontSize: 16,
   },
   amountValue: {
-    fontSize: 16,
+    fontSize: 12,
     color: '#10B981',
   },
   printButtonContainer: {
@@ -107,7 +112,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(239, 68, 68, 0.1)',
     paddingHorizontal: 20,
-    paddingVertical: 6,
+    paddingVertical: 4,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#EF4444',
@@ -115,13 +120,13 @@ export const styles = StyleSheet.create({
   },
   printButtonText: {
     color: '#EF4444',
-    fontSize: 14,
+    fontSize: 10,
     fontWeight: '600',
   },
   // Receipt Details Screen Styles
   logo: {
-    width: 100,
-    height: 100,
+    width: 60,
+    height: 60,
     marginRight: 15,
   },
   rightHeader: {

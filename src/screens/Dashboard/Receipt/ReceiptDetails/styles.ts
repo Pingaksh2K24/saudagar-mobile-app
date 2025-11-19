@@ -3,12 +3,12 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000B43',
+    backgroundColor: '#0F243D',
   },
   content: {
     flex: 1,
     paddingHorizontal: 20,
-    paddingTop:20,
+    paddingTop: 20,
   },
   receiptCard: {
     backgroundColor: '#fff',
@@ -39,7 +39,7 @@ export const styles = StyleSheet.create({
   headerInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 10
+    marginBottom: 10,
   },
   leftInfo: {
     alignItems: 'flex-start',
@@ -174,13 +174,15 @@ export const styles = StyleSheet.create({
     marginTop: 10,
   },
   buttonContainer: {
-    marginBottom: 100,
+    marginBottom: 80,
     paddingBottom: 20,
+    width: '60%',
+    alignSelf: 'center',
   },
   printBtn: {
     backgroundColor: '#fff',
     borderRadius: 15,
-    padding: 18,
+    padding: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -190,7 +192,7 @@ export const styles = StyleSheet.create({
   },
   printBtnText: {
     color: '#EF4444',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
   },
   printBtnDisabled: {

@@ -3,11 +3,11 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   bottomNav: {
     flexDirection: 'row',
-    backgroundColor: '#EF4444',
+    backgroundColor: '#0F243D',
     paddingVertical: 0,
     paddingHorizontal: 8,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.1,
@@ -33,8 +33,8 @@ export const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   activeIconContainer: {
-    backgroundColor: '#EF4444',
-    shadowColor: '#EF4444',
+    backgroundColor: '#0F243D',
+    shadowColor: '#0F243D',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,

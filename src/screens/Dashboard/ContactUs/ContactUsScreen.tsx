@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Linking } from 'react-native';
+import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Linking, StatusBar } from 'react-native';
 import { BackHeader } from '../../../components/BackHeader/BackHeader';
 import { BottomNavigation } from '../../../components/BottomMenu/BottomMenu';
 import { TelegramModal } from '../../../components/Modal/TelegramModal';
@@ -32,27 +32,31 @@ export const ContactUsScreen: React.FC = () => {
   }, []);
   const contactMethods = [
     {
-      type: 'Phone',
+      type: 'Phone Call',
       value: '+91 98348 28054',
       icon: 'phone',
+      color: '#10B981',
       action: () => Linking.openURL('tel:+919834828054')
     },
     {
       type: 'WhatsApp',
       value: '+91 98348 28054',
       icon: 'chat',
+      color: '#059669',
       action: () => Linking.openURL('https://wa.me/919834828054')
     },
     {
-      type: 'Email',
+      type: 'Email Support',
       value: 'support@saudagar.com',
       icon: 'email',
+      color: '#DC2626',
       action: () => Linking.openURL('mailto:supportsaudagar@gmail.com')
     },
     {
       type: 'Telegram',
       value: '@SaudagarSupport',
       icon: 'send',
+      color: '#3B82F6',
       action: () => setShowTelegramModal(true)
     }
   ];
@@ -87,6 +91,7 @@ export const ContactUsScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#DC2626" />
       <BackHeader 
         title="Contact Us"
       />
@@ -102,8 +107,8 @@ export const ContactUsScreen: React.FC = () => {
               style={styles.contactCard}
               onPress={method.action}
             >
-              <View style={styles.contactIcon}>
-                <Icon name={method.icon} size={24} color="#FFFFFF" />
+              <View style={[styles.contactIcon, { backgroundColor: method.color }]}>
+                <Icon name={method.icon} size={16} color="#FFFFFF" />
               </View>
               <View style={styles.contactInfo}>
                 <Text style={styles.contactType}>{method.type}</Text>

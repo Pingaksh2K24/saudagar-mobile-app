@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000B43',
+    backgroundColor: '#F8FAFC',
   },
   content: {
     flex: 1,
@@ -15,18 +15,18 @@ export const styles = StyleSheet.create({
     marginBottom: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#6B7280',
   },
   totalBids: {
-    fontSize: 24,
+    fontSize: 16,
     fontWeight: '600',
-    color: '#fff',
+    color: '#6B7280',
     marginLeft: 8,
   },
   noDataText: {
-    color: '#9CA3AF',
+    color: '#64748Bp',
     textAlign: 'center',
     fontSize: 16,
     marginTop: 20,
@@ -37,30 +37,33 @@ export const styles = StyleSheet.create({
   bidCard: {
     borderRadius: 16,
     marginBottom: 16,
+    backgroundColor: '#FFFFFF',
     borderLeftWidth: 4,
-    borderLeftColor: '#EF4444',
+    borderLeftColor: '#3B82F6',
+    borderWidth: 1,
+    borderColor: '#3B82F6',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
     elevation: 6,
   },
   bidCardInner: {
-    padding: 18,
+    padding: 10,
   },
   bidHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 16,
+    marginBottom: 10,
   },
   gameInfo: {
     flex: 1,
   },
   gameName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#1E293B',
     marginBottom: 4,
   },
   bidTypeRow: {
@@ -81,19 +84,19 @@ export const styles = StyleSheet.create({
   statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
     borderRadius: 8,
     gap: 4,
   },
   statusText: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#ffffff',
     textTransform: 'capitalize',
   },
   bidDetails: {
-    gap: 8,
+    gap: 0,
   },
   detailRow: {
     flexDirection: 'row',
@@ -111,19 +114,19 @@ export const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 16,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: '#F1F5F9',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
   detailLabel: {
     fontSize: 14,
-    color: '#9CA3AF',
+    color: '#64748B',
   },
   detailValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#1E293B',
     paddingLeft: 8,
     flex: 1,
     textAlign: 'left',
@@ -134,7 +137,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    color: '#FFFFFF',
+    color: '#ffffff',
     fontSize: 14,
   },
   noMoreContainer: {

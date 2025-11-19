@@ -45,7 +45,7 @@ export const BottomNavigation: React.FC<BottomNavigationProps> = ({
           ]}>
             <Icon 
               name={item.icon}
-              size={32}
+              size={24}
               color={activeTab === item.id ? '#FFFFFF' : '#6B7280'}
             />
           </View>

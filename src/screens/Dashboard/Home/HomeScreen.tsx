@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, Modal } from 'react-native';
+import { View, Text, ScrollView, Modal, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import LinearGradient from 'react-native-linear-gradient';
@@ -10,7 +10,6 @@ import { Header } from '../../../components/Header/Header';
 import { Loader } from '../../../components/Loader/Loader';
 import { DialogBox } from '../../../components/DialogBox/DialogBox';
 import DashboardServices from '../../../services/axiosServices/apiServices/DashboardServices';
-import { dateUtils } from '../../../utils/dateUtils';
 import { convertTo12HourFormat, getGameStatus } from '../../../utils/helper';
 import { styles } from './styles';
 
@@ -67,6 +66,7 @@ export const HomeScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
+      <StatusBar barStyle="dark-content" backgroundColor="#DC2626" />
       {/* Header */}
       <Header
         onMenuPress={toggleMenu}
@@ -86,7 +86,7 @@ export const HomeScreen: React.FC = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Available Games</Text>
           {isLoading ? (
-            <Loader color="#FFFFFF" />
+            <Loader color="#6B7280" />
           ) : (
           <View style={styles.gamesContainer}>
             {gameList && gameList.length > 0 ? (
@@ -96,7 +96,7 @@ export const HomeScreen: React.FC = () => {
                   onPress={() => {
                     const gameStatus = getGameStatus(game?.open_time, game?.close_time);
                     let availableSessions = [];
-                    
+
                     if (gameStatus.status === 'Open') {
                       availableSessions = ['Open', 'Close'];
                     } else if (gameStatus.status === 'Bidding for Close') {
@@ -121,12 +121,7 @@ export const HomeScreen: React.FC = () => {
                     }
                   }}
                 >
-                  <LinearGradient
-                    colors={['#1B2951', '#2D3748', '#1B2951']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.gameCard}
-                  >
+                  <View style={styles.gameCard}>
                     <View style={styles.gameHeader}>
                       <Text style={styles.gameName}>{game?.game_name}</Text>
                       <View
@@ -153,7 +148,7 @@ export const HomeScreen: React.FC = () => {
                         style={styles.winningNumber}
                       >{`${game?.open_result}-${game?.winning_number}-${game?.close_result}`}</Text>
                     </View>
-                  </LinearGradient>
+                  </View>
                 </TouchableOpacity>
               ))
             ) : (

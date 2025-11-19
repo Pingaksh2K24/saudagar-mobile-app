@@ -1,101 +1,3 @@
-export const hexToRGB = (h) => {
-  let r = 0;
-  let g = 0;
-  let b = 0;
-  if (h.length === 4) {
-    r = `0x${h[1]}${h[1]}`;
-    g = `0x${h[2]}${h[2]}`;
-    b = `0x${h[3]}${h[3]}`;
-  } else if (h.length === 7) {
-    r = `0x${h[1]}${h[2]}`;
-    g = `0x${h[3]}${h[4]}`;
-    b = `0x${h[5]}${h[6]}`;
-  }
-  return `${+r},${+g},${+b}`;
-};
-
-export const formatValue = (value) => Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-  maximumSignificantDigits: 3,
-  notation: 'compact',
-}).format(value);
-
-export const formatThousands = (value) => Intl.NumberFormat('en-US', {
-  maximumSignificantDigits: 3,
-  notation: 'compact',
-}).format(value);
-
-// To use in decimal type of inputs (e.g Price)
-export const convertToDecimal = (value) => {
-  if (value.includes('.')) {
-    if (value[(value.length - 1)] === '.') {
-      value = (!value || value === '') ? null : value;
-      value = isNaN(value) ? 0 : value;
-      return value;
-    }
-    else{
-      value = (!value || value === '') ? null : value;
-      value = isNaN(value) ? 0 : parseFloat(value);
-      return value;
-    }
-  }
-  else {
-    value = (!value || value === '') ? null : value;
-    value = isNaN(value) ? 0 : Number(value);
-    return value;
-  }
-}
-
-/**
- * 
- * @param {value} value 
- * @returns 0 if input number is null or 0
- */
-export const isNullNumber = (value) => {
-  if(value === null || value === 0 || !value || value < 0 || isNaN(value)){
-    return 0;
-  }
-  else{
-    return value;
-  }
-}
-
-/**
- * 
- * @param {value} value 
- * @returns empty string if string is null or empty 
- */
-export const isNullString = (value) => {
-  if(value === null || value === "" || !value){
-    return "";
-  }
-  else{
-    return value;
-  }
-}
-
-
-/**
- * 
- * @param {value} value 
- * @returns empty false if boolean is null or undefined 
- */
- export const isNullBoolean = (value) => {
-  if(value === null || value === "" || value === undefined){
-    return false;
-  }
-  else{
-    return value;
-  }
-}
-
-export const getFileSource = (module, name) => {
-  // src={APIURL + "Common/GetImage?type=resourcedescription&&fileName=" + value.resourceDescriptionImage} 
-  if(module && name){
-
-  }
-}
 
 export const formatDateTime = (dateString) => {
   const date = new Date(dateString);
@@ -141,78 +43,6 @@ export const getGameStatus = (openTime, closeTime) => {
     return { status: 'Close for Today', color: '#EF4444' };
   }
 };
-/**
- * Get the digit of Month from given Date
- * If date string is not valid then return 0
- * @param  {string} dateString The valid date string
- * @return {Number}      The month digit
- */
-export const dateMonth = (dateString) => {
-    let month = 0;
-    if (!isNaN(Date.parse(dateString))) {
-        month = new Date(dateString).toLocaleString('default', { month: 'numeric' });
-        return month;
-    }
-    return month;
-
-}
-/**
- * Get the Difference of Years between two valid dates
- * @param {Date} endDate - the end date
- * @param {Date} startDate - the start date
- * @return {number} Difference of Years between startDate and endDate
-*/
-export const yearDifference = (endDate, startDate) => {
-    if (!isNaN(Date.parse(startDate)) && !isNaN(Date.parse(endDate))) {
-        let sDate = new Date(startDate);
-        let eDate = new Date(endDate);
-        let yearsDiff = eDate.getFullYear() - sDate.getFullYear();
-        return yearsDiff;
-
-    }
-
-}
-/**
- * Get the Difference of Months between two valid dates
- * @param {Date} endDate - the end date
- * @param {Date} startDate - the start date
- * @return {number} Difference of Months between startDate and endDate
-*/
-export const monthDifference = (endDate, startDate, roundUpFractionalMonths) => {
-    if (!isNaN(Date.parse(startDate)) && !isNaN(Date.parse(endDate))) {
-        let sDate = new Date(startDate);
-        let eDate = new Date(endDate);
-        let inverse = false;
-        if (startDate > endDate) {
-            eDate = new Date(startDate);
-            sDate = new Date(endDate);
-            inverse = true;
-        }
-
-        let yearsDifference = yearDifference(eDate,sDate);
-        let monthsDifference = eDate.getMonth() - sDate.getMonth();
-        let daysDifference = eDate.getDate() - sDate.getDate();
-        let monthCorrection = 0;
-
-        //If roundUpFractionalMonths is true, check if an extra month needs to be added from rounding up.
-        //The difference is done by ceiling (round up), e.g. 3 months and 1 day will be 4 months.
-        if (roundUpFractionalMonths === true && daysDifference > 0) {
-            monthCorrection = 1;
-        }
-
-        //If the day difference between the 2 months is negative, the last month is not a whole month.
-        else if (roundUpFractionalMonths !== true && daysDifference < 0) {
-            monthCorrection = -1;
-        }
-        let months = (inverse ? -1 : 1) * (yearsDifference * 12 + monthsDifference + monthCorrection);
-
-        return months;
-
-    }
-
-}
-
-
 // Helper function to get bidding cutoff time (10 minutes before close time)
 export const getBiddingCutoffTime = (closeTime) => {
   if (!closeTime) return null;
@@ -255,4 +85,73 @@ export const getDoublePannaCombinations = (digit) => {
 
   };
   return combinations[digit] || [];
+};
+
+export const getKatPannaCombinations = (digit) => {
+  const combinations = {
+    '0': ['136','127','389','479','550'],
+    '1': ['380','489','560','146','227'],
+    '2': ['138','499','156','570','137'],
+    '3': ['247','166','238','490','580'],
+    '4': ['167','257','338','149','590'],
+    '5': ['168','267','348','249','500'],
+    '6': ['150','277','358','349','169'],
+    '7': ['160','278','368','449','250'],
+    '8': ['279','350','116','378','459'],
+    '9': ['126','388','450','270','469'],
+
+  };
+  return combinations[digit] || [];
+};
+
+export const getPannaType = (number) => {
+  if (number.length !== 3) return null;
+  
+  const digits = number.split('');
+  
+  // Check if all digits are same (TP)
+  if (digits[0] === digits[1] && digits[1] === digits[2]) {
+    return 'TP';
+  }
+  // Check if any two digits are same (DP)
+  else if (digits[0] === digits[1] || digits[1] === digits[2] || digits[0] === digits[2]) {
+    return 'DP';
+  }
+  // All digits are different (SP)
+  else {
+    return 'SP';
+  }
+};
+
+export const generateJugarCombinations = (jugarNumber) => {
+  const parts = jugarNumber.split('/');
+  if (parts.length !== 2) return [];
+  
+  const beforeSlash = parts[0];
+  const afterSlash = parts[1];
+  const combinations = [];
+  
+  for (let i = 0; i < beforeSlash.length; i++) {
+    for (let j = 0; j < afterSlash.length; j++) {
+      combinations.push(beforeSlash[i] + afterSlash[j]);
+    }
+  }
+  
+  return combinations;
+};
+
+export const generateMultiplePannaCombinations = (selectedNumbers, type) => {
+  const allCombinations = [];
+  
+  selectedNumbers.forEach(number => {
+    if (type === 'SP') {
+      const combinations = getSinglePannaCombinations(number.toString());
+      allCombinations.push(...combinations);
+    } else if (type === 'DP') {
+      const combinations = getDoublePannaCombinations(number.toString());
+      allCombinations.push(...combinations);
+    }
+  });
+  
+  return allCombinations;
 };

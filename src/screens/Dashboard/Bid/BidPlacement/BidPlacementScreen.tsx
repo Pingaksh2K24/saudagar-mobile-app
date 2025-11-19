@@ -25,7 +25,14 @@ import {
   calculateTotal as calculateTotalHelper,
   getNumberPlaceholder,
 } from './bidHelpers';
-import { getSinglePannaCombinations, getDoublePannaCombinations, getBiddingCutoffTime } from '../../../../utils/helper';
+import {
+  getSinglePannaCombinations,
+  getDoublePannaCombinations,
+  getBiddingCutoffTime,
+  getPannaType,
+  generateJugarCombinations,
+  generateMultiplePannaCombinations,
+} from '../../../../utils/helper';
 import { styles } from './styles';
 
 export const BidPlacementScreen: React.FC = () => {
@@ -69,7 +76,18 @@ export const BidPlacementScreen: React.FC = () => {
   );
   const [isLoading, setIsLoading] = useState(false);
   const [bidList, setBidList] = useState<BidData[]>([]);
+  const [jugarInput, setJugarInput] = useState('/');
+  const [jodiInput, setJodiInput] = useState('');
+  const [jodiAmount, setJodiAmount] = useState('');
+  const [pannaInput, setPannaInput] = useState('');
+  const [pannaAmount, setPannaAmount] = useState('');
+  const [jugarAmount, setJugarAmount] = useState('');
+  const [selectedSPNumbers, setSelectedSPNumbers] = useState([]);
+  const [spAmount, setSpAmount] = useState('');
+  const [selectedDPNumbers, setSelectedDPNumbers] = useState([]);
+  const [dpAmount, setDpAmount] = useState('');
   const numberInputRef = useRef<TextInput>(null);
+  const numberList = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   // ============================================
   // INITIALIZATION
@@ -111,26 +129,28 @@ export const BidPlacementScreen: React.FC = () => {
     const checkSessionTiming = () => {
       const now = new Date();
       const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-      
+
       if (selectedSession === 'Open' && openTime) {
         const cutoffTime = getBiddingCutoffTime(openTime);
         if (cutoffTime && currentTime >= cutoffTime) {
           showNotification({
             type: 'warning',
             title: 'Bidding Closed',
-            message: 'Open session bidding is now closed (10 minutes before open time)',
+            message:
+              'Open session bidding is now closed (10 minutes before open time)',
           });
           navigation.navigate('Home');
         }
       }
-      
+
       if (selectedSession === 'Close' && closeTime) {
         const cutoffTime = getBiddingCutoffTime(closeTime);
         if (cutoffTime && currentTime >= cutoffTime) {
           showNotification({
             type: 'warning',
             title: 'Bidding Closed',
-            message: 'Close session bidding is now closed (10 minutes before close time)',
+            message:
+              'Close session bidding is now closed (10 minutes before close time)',
           });
           navigation.navigate('Home');
         }
@@ -139,7 +159,7 @@ export const BidPlacementScreen: React.FC = () => {
 
     const interval = setInterval(checkSessionTiming, 60000); // Check every minute
     checkSessionTiming(); // Check immediately
-    
+
     return () => clearInterval(interval);
   }, [selectedSession, openTime, closeTime]);
 
@@ -166,8 +186,10 @@ export const BidPlacementScreen: React.FC = () => {
   };
   // Add current bid to the bid list with validation
   const addBidRow = () => {
-    const selectedType = bidTypesList.find(type => type.id === selectedBidType);
-    
+    const selectedType = bidTypesList.find(
+      (type) => type.id === selectedBidType
+    );
+
     // Handle JUG bid type - generate all combinations
     if (selectedType?.bid_code === 'JUG') {
       if (!currentBid.bid_number || !currentBid.amount) {
@@ -178,7 +200,7 @@ export const BidPlacementScreen: React.FC = () => {
         });
         return;
       }
-      
+
       const parts = currentBid.bid_number.split('/');
       if (parts.length !== 2 || !parts[0] || !parts[1]) {
         showNotification({
@@ -188,11 +210,11 @@ export const BidPlacementScreen: React.FC = () => {
         });
         return;
       }
-      
+
       const beforeSlash = parts[0];
       const afterSlash = parts[1];
       const newBids: BidData[] = [];
-      
+
       // Generate all combinations
       for (let i = 0; i < beforeSlash.length; i++) {
         for (let j = 0; j < afterSlash.length; j++) {
@@ -211,7 +233,7 @@ export const BidPlacementScreen: React.FC = () => {
           newBids.push(newBid);
         }
       }
-      
+
       setBidList([...bidList, ...newBids]);
       setCurrentBid({
         ...currentBid,
@@ -223,11 +245,13 @@ export const BidPlacementScreen: React.FC = () => {
       numberInputRef.current?.focus();
       return;
     }
-    
+
     // For SP, DP - check if number came from dropdown (single digit) or manual input
     if (shouldShowNumberDropdown()) {
-      const isDropdownSelection = masterPannaData.number && currentBid.bid_number === masterPannaData.number;
-      
+      const isDropdownSelection =
+        masterPannaData.number &&
+        currentBid.bid_number === masterPannaData.number;
+
       if (isDropdownSelection) {
         // Dropdown selection - no validation needed
         if (!currentBid.bid_number || !currentBid.amount) {
@@ -238,13 +262,14 @@ export const BidPlacementScreen: React.FC = () => {
           });
           return;
         }
-        
-        
+
         if (selectedType?.bid_code === 'SP') {
           // Generate all SP combinations for selected digit
-          const combinations = getSinglePannaCombinations(currentBid.bid_number);
+          const combinations = getSinglePannaCombinations(
+            currentBid.bid_number
+          );
           const newBids: BidData[] = [];
-          
+
           combinations.forEach((combination: string) => {
             const newBid = {
               ...currentBid,
@@ -259,14 +284,16 @@ export const BidPlacementScreen: React.FC = () => {
             };
             newBids.push(newBid);
           });
-          
+
           setBidList([...bidList, ...newBids]);
           calculateTotalHelper([...bidList, ...newBids], setTotalAmount);
         } else if (selectedType?.bid_code === 'DP') {
           // Generate all DP combinations for selected digit
-          const combinations = getDoublePannaCombinations(currentBid.bid_number);
+          const combinations = getDoublePannaCombinations(
+            currentBid.bid_number
+          );
           const newBids: BidData[] = [];
-          
+
           combinations.forEach((combination: string) => {
             const newBid = {
               ...currentBid,
@@ -281,11 +308,11 @@ export const BidPlacementScreen: React.FC = () => {
             };
             newBids.push(newBid);
           });
-          
+
           setBidList([...bidList, ...newBids]);
           calculateTotalHelper([...bidList, ...newBids], setTotalAmount);
         }
-        
+
         setCurrentBid({
           ...currentBid,
           bid_number: '',
@@ -340,13 +367,15 @@ export const BidPlacementScreen: React.FC = () => {
   // Update current bid input with validation
   const updateCurrentBid = (field: 'bid_number' | 'amount', value: string) => {
     if (field === 'bid_number') {
-      const selectedType = bidTypesList.find(type => type.id === selectedBidType);
-      
+      const selectedType = bidTypesList.find(
+        (type) => type.id === selectedBidType
+      );
+
       // For JUG bid type, maintain slash formatting (10 digits / 10 digits)
       if (selectedType?.bid_code === 'JUG') {
         // Handle slash positioning
         const parts = value.split('/');
-        
+
         if (parts.length === 1) {
           // No slash yet, add it after input
           const digits = parts[0].replace(/\D/g, ''); // Only digits
@@ -363,7 +392,7 @@ export const BidPlacementScreen: React.FC = () => {
           const beforeSlash = parts[0].replace(/\D/g, '').slice(0, 10);
           const afterSlash = parts[1].replace(/\D/g, '').slice(0, 10);
           const formatted = beforeSlash + '/' + afterSlash;
-          
+
           setCurrentBid({
             ...currentBid,
             bid_number: formatted,
@@ -372,7 +401,7 @@ export const BidPlacementScreen: React.FC = () => {
         }
         return;
       }
-    }    
+    }
     updateCurrentBidHelper(
       field,
       value,
@@ -384,13 +413,15 @@ export const BidPlacementScreen: React.FC = () => {
   };
   // Check if current bid type requires number dropdown (SP, DP)
   const shouldShowNumberDropdown = () => {
-    const selectedType = bidTypesList.find(type => type.id === selectedBidType);
+    const selectedType = bidTypesList.find(
+      (type) => type.id === selectedBidType
+    );
     return selectedType?.bid_code === 'SP' || selectedType?.bid_code === 'DP';
   };
   // Handle number selection from dropdown
   const handleNumberSelect = (number: string) => {
     if (shouldShowNumberDropdown()) {
-      setMasterPannaData(prev => ({ ...prev, number }));
+      setMasterPannaData((prev) => ({ ...prev, number }));
       updateCurrentBid('bid_number', number);
     }
     setShowNumberDropdown(false);
@@ -404,16 +435,10 @@ export const BidPlacementScreen: React.FC = () => {
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
+        {/* <Text style={styles.sectionTitle}>Enter Bid Details</Text> */}
         <View style={styles.bidSection}>
-          <View style={styles.sessionContainer}>
-            <View style={styles.sessionHeader}>
-              <Text style={styles.sessionLabel}>Session</Text>
-              <View style={styles.totalInvestmentSmall}>
-                <Text style={styles.totalLabelSmall}>
-                  Total: ₹{totalAmount}
-                </Text>
-              </View>
-            </View>
+          {/* TOP ROW */}
+          <View style={styles.topRow}>
             <View style={styles.radioContainer}>
               {availableSessions.includes('Open') ? (
                 <TouchableOpacity
@@ -433,7 +458,7 @@ export const BidPlacementScreen: React.FC = () => {
                     style={[styles.radioCircle, styles.disabledCircle]}
                   ></View>
                   <Text style={[styles.radioText, styles.disabledText]}>
-                    Open (Closed)
+                    Open
                   </Text>
                 </View>
               )}
@@ -441,25 +466,7 @@ export const BidPlacementScreen: React.FC = () => {
               {availableSessions.includes('Close') ? (
                 <TouchableOpacity
                   style={styles.radioOption}
-                  onPress={() => {
-                    setSelectedSession('Close');
-                    // Auto-select SD if JD or JUG is currently selected
-                    const currentType = bidTypesList.find(
-                      (type) => type.id === selectedBidType
-                    );
-                    if (
-                      currentType?.bid_code === 'JD' ||
-                      currentType?.bid_code === 'JUG'
-                    ) {
-                      const sdType = bidTypesList.find(
-                        (type) => type.bid_code === 'SD'
-                      );
-                      if (sdType) {
-                        setSelectedBidType(sdType.id);
-                        setSelectedBidName(sdType.display_name);
-                      }
-                    }
-                  }}
+                  onPress={() => setSelectedSession('Close')}
                 >
                   <View style={styles.radioCircle}>
                     {selectedSession === 'Close' && (
@@ -474,147 +481,413 @@ export const BidPlacementScreen: React.FC = () => {
                     style={[styles.radioCircle, styles.disabledCircle]}
                   ></View>
                   <Text style={[styles.radioText, styles.disabledText]}>
-                    Close (Closed)
+                    Close
                   </Text>
                 </View>
               )}
             </View>
-            {!availableSessions.includes('Open') && (
-              <Text style={styles.timeWarning}>
-                Open time: {openTime} (Closed 10 min before)
-              </Text>
-            )}
-            {!availableSessions.includes('Close') && (
-              <Text style={styles.timeWarning}>
-                Close time: {closeTime} (Closed 10 min before)
-              </Text>
-            )}
+            <TouchableOpacity
+              style={styles.placeBidBtnTop}
+              onPress={() => {
+                placeBid();
+              }}
+            >
+              <Icon name="rocket-launch" size={16} color="#fff" />
+              <Text style={styles.placeBidTextTop}>Place Bid</Text>
+            </TouchableOpacity>
           </View>
 
-          <View style={styles.bidTypeContainer}>
-            <Text style={styles.bidTypeLabel}>Bid Type</Text>
+          {/* Single */}
+          <View style={styles.inputRow}>
+            <Text style={styles.rowTitle}>Single</Text>
+            <TextInput
+              style={styles.numberInput}
+              placeholder="Single Digit"
+              placeholderTextColor="#888"
+              value={currentBid.bid_number}
+              onChangeText={(value) => {
+                const numericValue = value.replace(/[^0-9]/g, '');
+                if (numericValue.length <= 1) {
+                  updateCurrentBid('bid_number', numericValue);
+                }
+              }}
+              keyboardType="numeric"
+              maxLength={1}
+            />
+            <View style={styles.priceBox}>
+              <Text style={styles.priceIcon}>₹</Text>
+              <TextInput
+                style={styles.amountInput}
+                placeholder="Price"
+                placeholderTextColor="#888"
+                value={currentBid.amount}
+                onChangeText={(value) => updateCurrentBid('amount', value)}
+                keyboardType="numeric"
+              />
+            </View>
+            <TouchableOpacity style={styles.addRowBtn} onPress={addBidRow}>
+              <Icon name="add" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Jodi */}
+          <View style={styles.inputRow}>
+            <Text style={styles.rowTitle}>Jodi</Text>
+            <TextInput
+              style={styles.numberInput}
+              placeholder="Jodi Digit"
+              placeholderTextColor="#888"
+              keyboardType="numeric"
+              value={jodiInput}
+              onChangeText={(value) => {
+                const numericValue = value.replace(/[^0-9]/g, '');
+                if (numericValue.length <= 2) {
+                  setJodiInput(numericValue);
+                }
+              }}
+              maxLength={2}
+            />
+            <View style={styles.priceBox}>
+              <Text style={styles.priceIcon}>₹</Text>
+              <TextInput
+                style={styles.amountInput}
+                placeholder="Price"
+                placeholderTextColor="#888"
+                keyboardType="numeric"
+                value={jodiAmount}
+                onChangeText={setJodiAmount}
+              />
+            </View>
+            <TouchableOpacity style={styles.addRowBtn} onPress={() => {
+              if (jodiInput && jodiAmount) {
+                const jodiType = bidTypesList.find(type => type.bid_code === 'JD');
+                const newBid = {
+                  user_id: userDetails.user_id,
+                  game_id: (route.params as any)?.gameId || 0,
+                  game_result_id: (route.params as any)?.gameResultId || 0,
+                  bid_type_id: jodiType?.id || selectedBidType,
+                  bid_name: jodiType?.display_name || 'Jodi Digit',
+                  bid_number: jodiInput,
+                  amount: jodiAmount,
+                  session_type: selectedSession,
+                };
+                setBidList([...bidList, newBid]);
+                setJodiInput('');
+                setJodiAmount('');
+                calculateTotalHelper([...bidList, newBid], setTotalAmount);
+              }
+            }}>
+              <Icon name="add" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Jugar */}
+          <View style={styles.inputRow}>
+            <Text style={styles.rowTitle}>Jugar</Text>
+            <TextInput
+              style={styles.numberInput}
+              placeholder="12/45"
+              placeholderTextColor="#888"
+              value={jugarInput}
+              onChangeText={(value) => {
+                // Remove all non-numeric characters except /
+                let cleanValue = value.replace(/[^0-9/]/g, '');
+                
+                // Always maintain slash in center
+                const parts = cleanValue.split('/');
+                const beforeSlash = (parts[0] || '').slice(0, 10);
+                const afterSlash = (parts[1] || '').slice(0, 10);
+                
+                setJugarInput(beforeSlash + '/' + afterSlash);
+              }}
+              keyboardType="numeric"
+            />
+            <View style={styles.priceBox}>
+              <Text style={styles.priceIcon}>₹</Text>
+              <TextInput
+                style={styles.amountInput}
+                placeholder="Price"
+                placeholderTextColor="#888"
+                keyboardType="numeric"
+                value={jugarAmount}
+                onChangeText={setJugarAmount}
+              />
+            </View>
+            <TouchableOpacity style={styles.addRowBtn} onPress={() => {
+              if (jugarInput && jugarAmount && jugarInput.includes('/')) {
+                const jugType = bidTypesList.find(type => type.bid_code === 'JUG');
+                const combinations = generateJugarCombinations(jugarInput);
+                const newBids = [];
+                
+                combinations.forEach(combination => {
+                  const newBid = {
+                    user_id: userDetails.user_id,
+                    game_id: (route.params as any)?.gameId || 0,
+                    game_result_id: (route.params as any)?.gameResultId || 0,
+                    bid_type_id: jugType?.id || selectedBidType,
+                    bid_name: jugType?.display_name || 'Jugar',
+                    bid_number: combination,
+                    amount: jugarAmount,
+                    session_type: selectedSession,
+                  };
+                  newBids.push(newBid);
+                });
+                
+                setBidList([...bidList, ...newBids]);
+                setJugarInput('/');
+                setJugarAmount('');
+                calculateTotalHelper([...bidList, ...newBids], setTotalAmount);
+              }
+            }}>
+              <Icon name="add" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Panna */}
+          <View style={styles.inputRow}>
+            <Text style={styles.rowTitle}>Panna</Text>
+            <TextInput
+              style={styles.numberInput}
+              placeholder="Enter Panna"
+              placeholderTextColor="#888"
+              keyboardType="numeric"
+              value={pannaInput}
+              onChangeText={(value) => {
+                const numericValue = value.replace(/[^0-9]/g, '');
+                if (numericValue.length <= 3) {
+                  setPannaInput(numericValue);
+                }
+              }}
+              maxLength={3}
+            />
+            <View style={styles.priceBox}>
+              <Text style={styles.priceIcon}>₹</Text>
+              <TextInput
+                style={styles.amountInput}
+                placeholder="Price"
+                placeholderTextColor="#888"
+                keyboardType="numeric"
+                value={pannaAmount}
+                onChangeText={setPannaAmount}
+              />
+            </View>
+            <TouchableOpacity style={styles.addRowBtn} onPress={() => {
+              if (pannaInput && pannaAmount && pannaInput.length === 3) {
+                const pannaTypeCode = getPannaType(pannaInput);
+                const pannaType = bidTypesList.find(type => type.bid_code === pannaTypeCode);
+                
+                const newBid = {
+                  user_id: userDetails.user_id,
+                  game_id: (route.params as any)?.gameId || 0,
+                  game_result_id: (route.params as any)?.gameResultId || 0,
+                  bid_type_id: pannaType?.id || selectedBidType,
+                  bid_name: pannaType?.display_name || 'Panna',
+                  bid_number: pannaInput,
+                  amount: pannaAmount,
+                  session_type: selectedSession,
+                };
+                setBidList([...bidList, newBid]);
+                setPannaInput('');
+                setPannaAmount('');
+                calculateTotalHelper([...bidList, newBid], setTotalAmount);
+              }
+            }}>
+              <Icon name="add" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+
+          {/* Motor Panna */}
+          <View style={styles.inputRow}>
+            <Text style={styles.rowTitle}>Motor</Text>
+            <TextInput
+              style={styles.numberInput}
+              placeholder="Enter Panna"
+              placeholderTextColor="#888"
+              keyboardType="numeric"
+              onChangeText={(value) => {
+                const numericValue = value.replace(/[^0-9]/g, '');
+                if (numericValue.length <= 6) {
+                  // Handle Motor input
+                }
+              }}
+              maxLength={6}
+            />
+            <View style={styles.priceBox}>
+              <Text style={styles.priceIcon}>₹</Text>
+              <TextInput
+                style={styles.amountInput}
+                placeholder="Price"
+                placeholderTextColor="#888"
+                keyboardType="numeric"
+              />
+            </View>
+            <TouchableOpacity style={styles.addRowBtn}>
+              <Icon name="add" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+
+          {/* SP */}
+          <View>
+            <Text style={styles.sectionTitle}>SP</Text>
             <View style={styles.bidTypeButtons}>
-              {bidTypesList
-                .filter((type: any) => {
-                  // Hide JD and JUG when Close session is selected
-                  if (
-                    selectedSession === 'Close' &&
-                    (type.bid_code === 'JD' || type.bid_code === 'JUG')
-                  ) {
-                    return false;
-                  }
-                  return true;
-                })
-                .map((type: any) => (
-                  <TouchableOpacity
-                    key={type.id}
-                    style={[
-                      styles.bidTypeButton,
-                      selectedBidType === type.id &&
-                        styles.selectedBidTypeButton,
-                    ]}
-                    onPress={() => {
-                      setSelectedBidType(type.id);
-                      setSelectedBidName(type.display_name);
-                      
-                      // For JUG bid type, set initial slash
-                      if (type.bid_code === 'JUG') {
-                        setCurrentBid({
-                          ...currentBid,
-                          bid_number: '/',
-                          bid_type_id: type.id,
-                        });
-                      } else {
-                        setCurrentBid({
-                          ...currentBid,
-                          bid_number: '',
-                          bid_type_id: type.id,
-                        });
-                      }
-                    }}
-                  >
-                    <Text
-                      style={[
-                        styles.bidTypeButtonText,
-                        selectedBidType === type.id &&
-                          styles.selectedBidTypeButtonText,
-                      ]}
-                    >
-                      {type.bid_code}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-            </View>
-          </View>
-
-
-
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Enter Bid Details</Text>
-            <View style={styles.buttonGroup}>
-              {shouldShowNumberDropdown() && (
-                <TouchableOpacity
-                  style={styles.numberDropdownButton}
-                  onPress={() => setShowNumberDropdown(true)}
+              {numberList.map((number) => (
+                <TouchableOpacity 
+                  key={number} 
+                  style={[styles.bidTypeButton, selectedSPNumbers.includes(number) && {backgroundColor: '#4F46E5'}]}
+                  onPress={() => {
+                    if (selectedSPNumbers.includes(number)) {
+                      setSelectedSPNumbers(selectedSPNumbers.filter(n => n !== number));
+                    } else {
+                      setSelectedSPNumbers([...selectedSPNumbers, number]);
+                    }
+                  }}
                 >
-                  <Text style={styles.numberDropdownButtonText}>
-                    {masterPannaData.number || 'Select'}
-                  </Text>
-                  <Icon name="arrow-drop-down" size={20} color="#fff" />
+                  <Text style={styles.bidTypeButtonText}>{number}</Text>
                 </TouchableOpacity>
-              )}
-              <TouchableOpacity
-                style={styles.placeBidBtnSmall}
-                onPress={() => {
-                  console.log('Place Bid button pressed');
-                  placeBid();
-                }}
-              >
-                <Icon name="rocket-launch" size={16} color="#fff" />
-                <Text style={styles.placeBidTextSmall}>Place Bid</Text>
-              </TouchableOpacity>
+              ))}
             </View>
           </View>
-
-          <View style={styles.bidCard}>
-            <View style={styles.inputRow}>
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Number</Text>
-                <TextInput
-                  ref={numberInputRef}
-                  style={[
-                    styles.numberInput,
-                    bidTypesList.find(type => type.id === selectedBidType)?.bid_code === 'JUG' && { textAlign: 'center' }
-                  ]}
-                  placeholder={getNumberPlaceholder(selectedBidType)}
-                  placeholderTextColor="#888"
-                  value={currentBid.bid_number}
-                  onChangeText={(value) =>
-                    updateCurrentBid('bid_number', value)
-                  }
-                  keyboardType="numeric"
-                />
-              </View>
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabel}>Amount (₹)</Text>
-                <View style={styles.amountInputRow}>
-                  <TextInput
-                    style={styles.amountInput}
-                    placeholder="0"
-                    placeholderTextColor="#888"
-                    value={currentBid.amount}
-                    onChangeText={(value) => updateCurrentBid('amount', value)}
-                    keyboardType="numeric"
-                  />
-                  <TouchableOpacity
-                    style={styles.addBtnSmall}
-                    onPress={addBidRow}
-                  >
-                    <Icon name="add" size={20} color="#fff" />
-                  </TouchableOpacity>
-                </View>
-              </View>
+          <View style={styles.inputRow}>
+            <View style={styles.priceBox}>
+              <Text style={styles.priceIcon}>₹</Text>
+              <TextInput
+                style={styles.amountInput}
+                placeholder="Price"
+                placeholderTextColor="#888"
+                keyboardType="numeric"
+                value={spAmount}
+                onChangeText={setSpAmount}
+              />
             </View>
+            <TouchableOpacity style={styles.addRowBtn} onPress={() => {
+              if (selectedSPNumbers.length > 0 && spAmount) {
+                const spType = bidTypesList.find(type => type.bid_code === 'SP');
+                const combinations = generateMultiplePannaCombinations(selectedSPNumbers, 'SP');
+                const newBids = [];
+                
+                combinations.forEach(combination => {
+                  const newBid = {
+                    user_id: userDetails.user_id,
+                    game_id: (route.params as any)?.gameId || 0,
+                    game_result_id: (route.params as any)?.gameResultId || 0,
+                    bid_type_id: spType?.id || selectedBidType,
+                    bid_name: spType?.display_name || 'SP',
+                    bid_number: combination,
+                    amount: spAmount,
+                    session_type: selectedSession,
+                  };
+                  newBids.push(newBid);
+                });
+                
+                setBidList([...bidList, ...newBids]);
+                setSelectedSPNumbers([]);
+                setSpAmount('');
+                calculateTotalHelper([...bidList, ...newBids], setTotalAmount);
+              }
+            }}>
+              <Icon name="add" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+
+          {/* DP */}
+          <View>
+            <Text style={styles.sectionTitle}>DP</Text>
+            <View style={styles.bidTypeButtons}>
+              {numberList.map((number) => (
+                <TouchableOpacity 
+                  key={number} 
+                  style={[styles.bidTypeButton, selectedDPNumbers.includes(number) && {backgroundColor: '#4F46E5'}]}
+                  onPress={() => {
+                    if (selectedDPNumbers.includes(number)) {
+                      setSelectedDPNumbers(selectedDPNumbers.filter(n => n !== number));
+                    } else {
+                      setSelectedDPNumbers([...selectedDPNumbers, number]);
+                    }
+                  }}
+                >
+                  <Text style={styles.bidTypeButtonText}>{number}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+          <View style={styles.inputRow}>
+            <View style={styles.priceBox}>
+              <Text style={styles.priceIcon}>₹</Text>
+              <TextInput
+                style={styles.amountInput}
+                placeholder="Price"
+                placeholderTextColor="#888"
+                keyboardType="numeric"
+                value={dpAmount}
+                onChangeText={setDpAmount}
+              />
+            </View>
+            <TouchableOpacity style={styles.addRowBtn} onPress={() => {
+              if (selectedDPNumbers.length > 0 && dpAmount) {
+                const dpType = bidTypesList.find(type => type.bid_code === 'DP');
+                const combinations = generateMultiplePannaCombinations(selectedDPNumbers, 'DP');
+                const newBids = [];
+                
+                combinations.forEach(combination => {
+                  const newBid = {
+                    user_id: userDetails.user_id,
+                    game_id: (route.params as any)?.gameId || 0,
+                    game_result_id: (route.params as any)?.gameResultId || 0,
+                    bid_type_id: dpType?.id || selectedBidType,
+                    bid_name: dpType?.display_name || 'DP',
+                    bid_number: combination,
+                    amount: dpAmount,
+                    session_type: selectedSession,
+                  };
+                  newBids.push(newBid);
+                });
+                
+                setBidList([...bidList, ...newBids]);
+                setSelectedDPNumbers([]);
+                setDpAmount('');
+                calculateTotalHelper([...bidList, ...newBids], setTotalAmount);
+              }
+            }}>
+              <Icon name="add" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+
+          {/* KP */}
+          <View>
+            <Text style={styles.sectionTitle}>KP</Text>
+            <View style={styles.bidTypeButtons}>
+              {numberList.map((number) => (
+                <TouchableOpacity key={number} style={styles.bidTypeButton}>
+                  <Text style={styles.bidTypeButtonText}>{number}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+          <View style={styles.inputRow}>
+            <View style={styles.priceBox}>
+              <Text style={styles.priceIcon}>₹</Text>
+              <TextInput
+                style={styles.amountInput}
+                placeholder="Price"
+                placeholderTextColor="#888"
+                keyboardType="numeric"
+              />
+            </View>
+            <TouchableOpacity style={styles.addRowBtn}>
+              <Icon name="add" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.sectionHeaderRight}>
+            <TouchableOpacity
+              style={styles.placeBidBtnSmall}
+              onPress={() => {
+                placeBid();
+              }}
+            >
+              <Icon name="rocket-launch" size={16} color="#fff" />
+              <Text style={styles.placeBidTextSmall}>Place Bid</Text>
+            </TouchableOpacity>
           </View>
 
           {bidList.length > 0 && (

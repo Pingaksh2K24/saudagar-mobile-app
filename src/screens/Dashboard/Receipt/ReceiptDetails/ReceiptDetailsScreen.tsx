@@ -8,6 +8,8 @@ import {
   Image,
   Alert,
   ActivityIndicator,
+  PermissionsAndroid,
+  Platform,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useRoute, useNavigation } from '@react-navigation/native';
@@ -27,9 +29,60 @@ export const ReceiptDetailsScreen: React.FC = () => {
     receiptNo: string;
   };
 
+  const requestBluetoothPermissions = async () => {
+    if (Platform.OS === 'android') {
+      try {
+        const permissions = [];
+        
+        // Check Android version and request appropriate permissions
+        if (Platform.Version >= 31) {
+          // Android 12+ permissions
+          permissions.push(
+            PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+            PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN
+          );
+        } else {
+          // Android 11 and below permissions
+          permissions.push(
+            PermissionsAndroid.PERMISSIONS.BLUETOOTH,
+            PermissionsAndroid.PERMISSIONS.BLUETOOTH_ADMIN,
+            PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+          );
+        }
+
+        const granted = await PermissionsAndroid.requestMultiple(permissions);
+        
+        // Check if all permissions are granted
+        const allPermissionsGranted = permissions.every(
+          permission => granted[permission] === PermissionsAndroid.RESULTS.GRANTED
+        );
+        
+        return allPermissionsGranted;
+      } catch (error) {
+        console.error('Permission request error:', error);
+        return false;
+      }
+    }
+    return true; // iOS doesn't need explicit Bluetooth permissions for printing
+  };
+
   const handlePrint = async () => {
     setIsPrinting(true);
+    
     try {
+      // Request Bluetooth permissions first
+      const hasPermissions = await requestBluetoothPermissions();
+      
+      if (!hasPermissions) {
+        showNotification({
+          type: 'error',
+          title: 'Permissions Required',
+          message: 'Bluetooth permissions are required for printing. Please enable them in app settings.',
+        });
+        setIsPrinting(false);
+        return;
+      }
+      
       const { NativeModules } = require('react-native');
       const { PrinterModule } = NativeModules;
       
@@ -62,10 +115,25 @@ export const ReceiptDetailsScreen: React.FC = () => {
       });
     } catch (error) {
       console.error('Print error:', error);
+      
+      let errorMessage = 'Please check printer connection and try again.';
+      
+      if (error.code === 'NO_PERMISSION') {
+        errorMessage = 'Bluetooth permissions required. Please enable all Bluetooth permissions in Settings > Apps > Saudagar > Permissions.';
+      } else if (error.code === 'BLUETOOTH_DISABLED') {
+        errorMessage = 'Please enable Bluetooth and try again.';
+      } else if (error.code === 'NO_PRINTER') {
+        errorMessage = 'No printer found. Please pair your thermal printer in Bluetooth settings first.';
+      } else if (error.code === 'CONNECTION_ERROR') {
+        errorMessage = 'Connection failed. Please ensure printer is on and nearby, then try again.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       showNotification({
         type: 'error',
         title: 'Print Failed',
-        message: error.message || 'Please check printer connection and try again.',
+        message: errorMessage,
       });
     } finally {
       setIsPrinting(false);

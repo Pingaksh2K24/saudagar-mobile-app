@@ -117,22 +117,19 @@ export const BidHistoryScreen: React.FC = () => {
         }}
       >
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>Bid History: </Text>
+          <Text style={styles.title}>Total Bids: </Text>
           <Text style={styles.totalBids}>{totalBids}</Text>
         </View>
 
         {loading && bidHistoryList.length === 0 ? (
-          <Loader color="#FFFFFF" />
+          <Loader color="#6B7280" />
         ) : bidHistoryList.length === 0 ? (
           <Text style={styles.noDataText}>No bid history found</Text>
         ) : (
           <View style={styles.historyContainer}>
             {bidHistoryList.map((bid: any, index: number) => (
-              <LinearGradient
+              <View
                 key={`${bid.id}-${index}`}
-                colors={['#1B2951', '#2D3748', '#1B2951']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
                 style={styles.bidCard}
               >
                 <TouchableOpacity style={styles.bidCardInner}>
@@ -212,7 +209,7 @@ export const BidHistoryScreen: React.FC = () => {
                     </View>
                   </View>
                 </TouchableOpacity>
-              </LinearGradient>
+              </View>
             ))}
             {loading && (
               <View style={styles.loadingContainer}>

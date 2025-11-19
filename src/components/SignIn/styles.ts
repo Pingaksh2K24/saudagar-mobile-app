@@ -55,18 +55,20 @@ export const styles = StyleSheet.create({
   },
   submitButton: {
     backgroundColor: '#EF4444',
-    paddingVertical: 16,
+    paddingVertical: 12,
     borderRadius: 15,
     alignItems: 'center',
-    marginTop: 40,
+    marginTop: 20,
     marginBottom: 30,
+    width: '60%',
+    alignSelf: 'center',
   },
   submitButtonDisabled: {
     backgroundColor: '#7F8C8D',
   },
   submitButtonText: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
   }, 
   logoSection: {

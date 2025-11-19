@@ -8,6 +8,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingTop: 30,
     position: 'relative',
+    backgroundColor: '#F8FAFC',
   },
   backButton: {
     padding: 10,
@@ -16,7 +17,7 @@ export const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#DC2626',
+    color: '#6B7280',
     position: 'absolute',
     left: 0,
     right: 0,

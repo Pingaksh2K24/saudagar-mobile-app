@@ -10,8 +10,8 @@ export const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
   },
   menuContainer: {
-    width: 300,
-    backgroundColor: '#0F1629',
+    width: 280,
+    backgroundColor: '#0F243D',
     shadowColor: '#000',
     shadowOffset: { width: 2, height: 0 },
     shadowOpacity: 0.3,
@@ -23,7 +23,7 @@ export const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingTop: 10,
+    paddingTop: 30,
     paddingBottom: 10,
   },
   closeButton: {

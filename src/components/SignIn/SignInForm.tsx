@@ -90,7 +90,7 @@ export const SignInForm: React.FC<SignInFormProps> = ({
         disabled={isLoading}
       >
         <Text style={styles.submitButtonText}>
-          {isLoading ? 'Signing In...' : 'Log in'}
+          {isLoading ? 'Signing In...' : 'Login'}
         </Text>
       </TouchableOpacity>
         </View>

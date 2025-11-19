@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000B43',
+    backgroundColor: '#F8FAFC',
   },
   content: {
     flex: 1,
@@ -16,13 +16,13 @@ export const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#64748B',
     marginBottom: 15,
   },
   scanButton: {
     backgroundColor: '#EF4444',
     borderRadius: 10,
-    padding: 15,
+    padding: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -38,7 +38,7 @@ export const styles = StyleSheet.create({
     maxHeight: 300,
   },
   deviceItem: {
-    backgroundColor: '#1A2332',
+    backgroundColor: '#0F243D',
     borderRadius: 10,
     padding: 8,
     marginBottom: 10,
@@ -46,7 +46,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   connectedDevice: {
-    backgroundColor: '#10B981',
+    backgroundColor: '#063e2bff',
     opacity: 0.8,
   },
   deviceInfo: {
@@ -60,13 +60,13 @@ export const styles = StyleSheet.create({
   },
   deviceName: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
-    marginBottom: 5,
+    marginBottom: 2,
   },
   deviceAddress: {
-    color: '#9CA3AF',
-    fontSize: 14,
+    color: '#fff',
+    fontSize: 12,
   },
   printButton: {
     backgroundColor: '#FFFFFF',

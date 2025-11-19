@@ -8,6 +8,8 @@ export const styles = StyleSheet.create({
         alignItems: 'center',
         paddingVertical: 0,
         paddingHorizontal: 15,
+        // backgroundColor: '#0F243D',
+        height: 50,
     },
     menuButton: {
         padding: 10,

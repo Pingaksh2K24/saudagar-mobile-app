@@ -10,6 +10,7 @@ import {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useNavigation } from '@react-navigation/native';
 import { BackHeader } from '../../../components/BackHeader/BackHeader';
+import { BottomNavigation } from '../../../components/BottomMenu/BottomMenu';
 import { useNotification } from '../../../components/Notification/NotificationManager';
 import { styles } from './styles';
 
@@ -29,31 +30,47 @@ export const PrintTestScreen: React.FC = () => {
   const scanDevices = async () => {
     setIsScanning(true);
     try {
+      // For now using mock devices, but you can implement actual Bluetooth scanning
       setTimeout(() => {
         const mockDevices = [
           { name: 'POS-58', address: '00:11:22:33:44:55' },
           { name: 'Thermal Printer', address: '00:11:22:33:44:56' },
+          { name: 'POS-80', address: '00:11:22:33:44:57' },
         ];
         setDevices(mockDevices);
         setIsScanning(false);
+        
+        showNotification({
+          type: 'info',
+          title: 'Scan Complete',
+          message: `Found ${mockDevices.length} devices. Make sure your printer is paired in Bluetooth settings.`,
+        });
       }, 2000);
     } catch (error) {
       setIsScanning(false);
       showNotification({
         type: 'error',
         title: 'Scan Failed',
-        message: 'Failed to scan for devices',
+        message: 'Failed to scan for devices. Please check Bluetooth permissions.',
       });
     }
   };
 
   const connectDevice = async (device: BluetoothDevice) => {
-    setConnectedDevice(device.address);
-    showNotification({
-      type: 'success',
-      title: 'Connected',
-      message: `Connected to ${device.name}`,
-    });
+    try {
+      setConnectedDevice(device.address);
+      showNotification({
+        type: 'success',
+        title: 'Device Selected',
+        message: `Selected ${device.name}. Use 'Print Test' to verify connection.`,
+      });
+    } catch (error) {
+      showNotification({
+        type: 'error',
+        title: 'Selection Failed',
+        message: 'Failed to select device',
+      });
+    }
   };
 
   const printTest = async () => {
@@ -61,6 +78,10 @@ export const PrintTestScreen: React.FC = () => {
     try {
       const { NativeModules } = require('react-native');
       const { PrinterModule } = NativeModules;
+      
+      if (!PrinterModule) {
+        throw new Error('Printer module not found. Please restart the app.');
+      }
       
       const testReceipt = `
         SAUDAGAR
@@ -80,18 +101,34 @@ your printer is working correctly.
 
 `;
 
-      await PrinterModule.printReceipt(testReceipt);
+      const result = await PrinterModule.printReceipt(testReceipt);
       
       showNotification({
         type: 'success',
         title: 'Print Successful',
-        message: 'Test receipt printed successfully!',
+        message: result || 'Test receipt printed successfully!',
       });
     } catch (error) {
+      console.error('Print Error:', error);
+      
+      let errorMessage = 'Failed to print test receipt';
+      
+      if (error.code === 'NO_PERMISSION') {
+        errorMessage = 'Bluetooth permissions required. Please enable all Bluetooth permissions in Settings > Apps > Saudagar > Permissions.';
+      } else if (error.code === 'BLUETOOTH_DISABLED') {
+        errorMessage = 'Please enable Bluetooth and try again.';
+      } else if (error.code === 'NO_PRINTER') {
+        errorMessage = 'No printer found. Please pair your thermal printer in Bluetooth settings first.';
+      } else if (error.code === 'CONNECTION_ERROR') {
+        errorMessage = 'Connection failed. Please ensure printer is on and nearby, then try again.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       showNotification({
         type: 'error',
         title: 'Print Failed',
-        message: error.message || 'Failed to print test receipt',
+        message: errorMessage,
       });
     } finally {
       setIsPrinting(false);
@@ -173,6 +210,8 @@ your printer is working correctly.
           </TouchableOpacity>
         </View>
       </View>
+      
+      <BottomNavigation activeTab="Home" />
     </SafeAreaView>
   );
 };

@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000B43',
+    backgroundColor: '#F8FAFC',
   },
   content: {
     flex: 1,
@@ -29,28 +29,25 @@ export const styles = StyleSheet.create({
   userName: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FFFFFF',
-    marginBottom: 5,
+    color: '#0F243D',
+    marginBottom: 2,
   },
   userEmail: {
     fontSize: 16,
-    color: '#9CA3AF',
-  },
-  optionsContainer: {
-    marginTop: 5,
+    color: '#0F243D',
   },
   optionItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    padding: 15,
+    backgroundColor: '#0F243D',
+    padding: 10,
     borderRadius: 15,
     marginBottom: 15,
   },
   optionText: {
     flex: 1,
     fontSize: 16,
-    color: '#FFFFFF',
+    color: '#ffffff',
     marginLeft: 15,
   },
   logoutOption: {

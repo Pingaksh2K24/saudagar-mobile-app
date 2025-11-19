@@ -58,10 +58,10 @@ export const ReceiptScreen: React.FC = () => {
   };
 
   const handlePrintReceipt = (receiptNo: string) => {
-
     dashboardServices
       .getReceiptDetails(receiptNo)
       .then((response: any) => {
+        console.log("MyScreen :",response);
         if (
           response &&
           response?.statusCode === 200 &&
@@ -96,12 +96,12 @@ export const ReceiptScreen: React.FC = () => {
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {loading ? (
-          <Loader color="#FFFFFF" />
+          <Loader color="#6B7280" />
         ) : receipts?.length > 0 ? (
           receipts?.map((receipt, index) => (
             <LinearGradient
               key={index}
-              colors={['#1B2951', '#2D3748', '#1B2951']}
+              colors={['#0F243D', '#0F243D', '#0F243D']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={styles.receiptCard}

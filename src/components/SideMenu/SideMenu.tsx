@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,8 @@ import {
   SafeAreaView,
   Image,
   ScrollView,
+  StatusBar,
+  Animated,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -29,6 +31,7 @@ export const SideMenu: React.FC<SideMenuProps> = ({ isVisible, onClose }) => {
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const { logout } = useAuth();
   const { showNotification } = useNotification();
+  const slideAnim = useRef(new Animated.Value(-250)).current;
 
   useEffect(() => {
     SecureStorage.getUserSession(
@@ -45,6 +48,30 @@ export const SideMenu: React.FC<SideMenuProps> = ({ isVisible, onClose }) => {
       }
     );
   }, []);
+
+  useEffect(() => {
+    if (isVisible) {
+      // Change status bar immediately when opening
+      StatusBar.setBarStyle('light-content', true);
+      StatusBar.setBackgroundColor('rgba(0, 0, 0, 0.6)', true);
+      
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      Animated.timing(slideAnim, {
+        toValue: -250,
+        duration: 250,
+        useNativeDriver: true,
+      }).start(() => {
+        // Reset status bar after animation completes
+        StatusBar.setBarStyle('dark-content', true);
+        StatusBar.setBackgroundColor('#DC2626', true);
+      });
+    }
+  }, [isVisible, slideAnim]);
 
   const handleLogout = () => {
     setShowLogoutDialog(true);
@@ -95,7 +122,8 @@ export const SideMenu: React.FC<SideMenuProps> = ({ isVisible, onClose }) => {
     <View style={styles.overlay}>
       <TouchableOpacity style={styles.backdrop} onPress={onClose} />
 
-      <SafeAreaView style={styles.menuContainer}>
+      <Animated.View style={[styles.menuContainer, { transform: [{ translateX: slideAnim }] }]}>
+        <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.header}>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <Icon name="close" size={24} color="#FFFFFF" />
@@ -159,7 +187,8 @@ export const SideMenu: React.FC<SideMenuProps> = ({ isVisible, onClose }) => {
             </TouchableOpacity>
           ))}
         </ScrollView>
-      </SafeAreaView>
+        </SafeAreaView>
+      </Animated.View>
       
       <DialogBox
         visible={showLogoutDialog}

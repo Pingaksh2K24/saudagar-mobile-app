@@ -26,7 +26,6 @@ export const ProfileScreen: React.FC = () => {
   });
 
   useEffect(() => {
-    console.log('ProfileScreen: Starting to fetch user session...');
     SecureStorage.getUserSession(
       (session: any) => {
         if (session?.user) {
@@ -34,14 +33,13 @@ export const ProfileScreen: React.FC = () => {
             name: session.user.name || 'User',
             email: session.user.email || 'user@example.com',
           };
-          console.log('ProfileScreen: Setting user details:', userDetails);
           setUserDetails(userDetails);
         } else {
-          console.log('ProfileScreen: No user object found in session');
+          null;
         }
       },
       (error: any) => {
-        console.log('ProfileScreen: Error getting user session:', error);
+        null;
       }
     );
   }, []);
@@ -65,15 +63,14 @@ export const ProfileScreen: React.FC = () => {
 
         {/* Profile Options */}
         <View style={styles.optionsContainer}>
-         
           <TouchableOpacity style={styles.optionItem}>
             <Icon name="privacy-tip" size={24} color="#FFFFFF" />
             <Text style={styles.optionText}>Privacy Policy</Text>
             <Icon name="chevron-right" size={24} color="#9CA3AF" />
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={[styles.optionItem, styles.logoutOption]} 
+          <TouchableOpacity
+            style={[styles.optionItem, styles.logoutOption]}
             onPress={() => setShowLogoutDialog(true)}
           >
             <Icon name="logout" size={24} color="#EF4444" />
@@ -84,7 +81,7 @@ export const ProfileScreen: React.FC = () => {
       </ScrollView>
 
       <BottomNavigation activeTab="Profile" />
-      
+
       <DialogBox
         visible={showLogoutDialog}
         type="warning"
@@ -98,7 +95,7 @@ export const ProfileScreen: React.FC = () => {
           showNotification({
             type: 'success',
             title: 'Logged Out',
-            message: 'Logged out successfully'
+            message: 'Logged out successfully',
           });
           logout();
         }}
@@ -107,5 +104,3 @@ export const ProfileScreen: React.FC = () => {
     </SafeAreaView>
   );
 };
-
-

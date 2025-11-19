@@ -80,7 +80,7 @@ export const DialogBox: React.FC<DialogBoxProps> = ({
               { backgroundColor: config.backgroundColor },
             ]}
           >
-            <Icon name={config.icon} size={40} color={config.color} />
+            <Icon name={config.icon} size={18} color={config.color} />
           </View>
 
           <Text style={styles.title}>{title}</Text>
